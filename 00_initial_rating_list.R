@@ -7,7 +7,7 @@ data_path <- "https://docs.google.com/spreadsheets/d/1dj8J1QKNHAEHMJP-TwFtFk-Gh0
 rating_list_path <- "https://docs.google.com/spreadsheets/d/1Wh3PTzHAhoY7VKp-WfJgEF7IjWMYSdecgzIlwFnDA3E/edit?gid=0#gid=0"
 jugadores <- read_sheet(data_path, "jugadores")
 elo_inicial <- 1400
-version_inicial <- "20240000"
+version_inicial <- "20240801"
 
 lista_inicial <-
   jugadores |>
