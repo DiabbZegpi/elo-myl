@@ -1,7 +1,14 @@
 library(googlesheets4)
 library(tidyverse)
 
+# Only one time to set the cache directory
+# library(gargle)
+# options(gargle_oauth_cache = ".gargle")
 
+gs4_auth(
+  email = "diabbluis@gmail.com",
+  cache = ".gargle"
+)
 # Importar data -----------------------------------------------------------
 
 data_path <- "https://docs.google.com/spreadsheets/d/1dj8J1QKNHAEHMJP-TwFtFk-Gh0JXQ7Bayam6eXv2ai8/edit?gid=0#gid=0"
@@ -43,7 +50,7 @@ jugadores_por_rankear <-
   filter(id %in% torneos_por_computar) |>
   distinct(jugador) |>
   left_join(ultimo_ranking, join_by(jugador)) |>
-  mutate(elo = replace_na(elo_inicial))
+  mutate(elo = replace_na(elo, elo_inicial))
 
 rondas_por_computar <-
   resultados |>
