@@ -18,6 +18,8 @@ resultados <- read_sheet(data_path, "resultados", col_types = "ccDiccii")
 torneos <- read_sheet(data_path, "torneos", col_types = "cccDcc")
 jugadores <- read_sheet(data_path, "jugadores", col_types = "ccc")
 ranking <- read_sheet(rating_list_path, "ranking", col_types = "icd")
+torneos_computados <- read_sheet(rating_list_path, "torneos computados", col_types = "cD")
+
 
 # Parámetros --------------------------------------------------------------
 
@@ -30,15 +32,9 @@ ultima_version <- ranking$version |> max()
 
 torneos_por_computar <-
   torneos |>
-  filter(fecha > ymd(ultima_version)) |>
+  anti_join(torneos_computados, by = join_by(id)) |>
   distinct(id) |>
-  pull(id)
-
-torneos_computados <-
-  torneos |>
-  filter(fecha <= ymd(ultima_version)) |>
-  distinct(id) |>
-  pull(id)
+  mutate(computado_en = ymd(version_actual))
 
 ultimo_ranking <-
   ranking |>
@@ -47,19 +43,19 @@ ultimo_ranking <-
 
 jugadores_por_rankear <-
   torneos |>
-  filter(id %in% torneos_por_computar) |>
+  filter(id %in% torneos_por_computar$id) |>
   distinct(jugador) |>
   left_join(ultimo_ranking, join_by(jugador)) |>
   mutate(elo = replace_na(elo, elo_inicial))
 
 rondas_por_computar <-
   resultados |>
-  filter(torneo %in% torneos_por_computar) |>
+  filter(torneo %in% torneos_por_computar$id) |>
   select(jugador1, jugador2, puntos1, puntos2)
 
 rondas_computadas <-
   resultados |>
-  filter(torneo %in% torneos_computados)
+  filter(torneo %in% torneos_computados$id)
 
 
 # Cálculo de Elo ----------------------------------------------------------
@@ -115,7 +111,9 @@ nuevo_ranking <-
   mutate(version = !!version_actual) |>
   bind_rows(ranking)
 
+torneos_computados_joined <- bind_rows(torneos_computados, torneos_por_computar)
 
 # Exportar ranking --------------------------------------------------------
 
 write_sheet(nuevo_ranking, rating_list_path, "ranking")
+write_sheet(torneos_computados_joined, rating_list_path, "torneos computados")
