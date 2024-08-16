@@ -89,11 +89,18 @@ for (jugador in jugadores_por_rankear$jugador) {
     left_join(jugadores_por_rankear, by = join_by(oponente == jugador)) |>
     mutate(
       elo_jugador = !!elo_propio,
-      puntaje_esperado = 1 / (1 + 10 ^ ((elo - elo_propio) / 400)),
-      puntaje_total_esperado = puntaje_esperado * total,
-      variacion = puntos_a_favor - puntaje_total_esperado
-    ) |>
-    summarize(variacion_total = sum(variacion) * !!k_coef) |>
+      puntaje_esperado = 1 / (1 + 10 ^ ((elo - elo_propio) / 1135.77)),
+      resultado_match = case_when(
+        puntos_a_favor > puntos_en_contra ~ 1,
+        puntos_a_favor == puntos_en_contra ~ 0.5,
+        puntos_a_favor < puntos_en_contra ~ 0
+      ),
+      pd = puntos_a_favor - puntos_en_contra,
+      margen_coef = if_else(abs(pd) == 1 & (puntos_a_favor > 0 & puntos_en_contra > 0), 0.75, 1),
+      diff = resultado_match - puntaje_esperado,
+      variacion = diff * !!k_coef * margen_coef
+    )  |>
+    summarize(variacion_total = sum(variacion)) |>
     transmute(
       version = !!version_actual,
       jugador = !!jugador,
