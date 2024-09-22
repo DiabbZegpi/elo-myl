@@ -118,7 +118,9 @@ nuevo_ranking <-
   mutate(version = !!version_actual) |>
   bind_rows(ranking)
 
-torneos_computados_joined <- bind_rows(torneos_computados, torneos_por_computar)
+torneos_computados_joined <-
+  bind_rows(torneos_computados, torneos_por_computar) |>
+  arrange(desc(id))
 
 # Exportar ranking --------------------------------------------------------
 
