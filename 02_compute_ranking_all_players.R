@@ -174,11 +174,15 @@ for (semana_actual in todas_semanas) {
 
 }
 
+
+# Exportar ----------------------------------------------------------------
+
 torneos_computados <-
   torneos |>
   distinct(id_torneo, semana) |>
   mutate(computado_en = semana %m+% weeks(1)) |>
-  select(id_torneo, computado_en)
+  select(id_torneo, computado_en) |>
+  arrange(desc(computado_en))
 
 write_csv(ranking, here("data", "ranking.csv"))
 write_csv(jugadores, here("data", "jugadores.csv"))
@@ -188,8 +192,8 @@ write_csv(torneos_computados, here("data", "torneos_computados.csv"))
 
 
 gs4_auth(email = "diabbluis@gmail.com", cache = ".gargle")
-
 gs_db_url <- "https://docs.google.com/spreadsheets/d/1ZErNDZVSbIP8ekj-mmTpdmJ_Gbpo8yQaN5HeLBlqblE/edit?gid=0#gid=0"
+
 write_sheet(ranking, gs_db_url, "ranking")
 write_sheet(torneos, gs_db_url, "torneos")
 write_sheet(rondas, gs_db_url, "rondas")
