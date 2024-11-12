@@ -58,10 +58,11 @@ torneos <-
 
 # Tabla `rondas` ----------------------------------------------------------
 
-rondas <-
+resultados <-
   df_filtered |>
   select(
     id_torneo,
+    ronda,
     tor_a,
     tor_b,
     resultado_a,
@@ -101,7 +102,7 @@ for (semana_actual in todas_semanas) {
     filter(semana == semana_actual)
 
   rondas_semana <-
-    rondas |>
+    resultados |>
     filter(id_torneo %in% torneos_semana$id_torneo)
 
   jugadores_semana <-
@@ -187,7 +188,7 @@ torneos_computados <-
 write_csv(ranking, here("data", "ranking.csv"))
 write_csv(jugadores, here("data", "jugadores.csv"))
 write_csv(torneos, here("data", "torneos.csv"))
-write_csv(rondas, here("data", "rondas.csv"))
+write_csv(resultados, here("data", "resultados.csv"))
 write_csv(torneos_computados, here("data", "torneos_computados.csv"))
 
 
@@ -196,7 +197,7 @@ gs_db_url <- "https://docs.google.com/spreadsheets/d/1ZErNDZVSbIP8ekj-mmTpdmJ_Gb
 
 write_sheet(ranking, gs_db_url, "ranking")
 write_sheet(torneos, gs_db_url, "torneos")
-write_sheet(rondas, gs_db_url, "rondas")
+write_sheet(resultados, gs_db_url, "resultados")
 write_sheet(jugadores, gs_db_url, "jugadores")
 write_sheet(torneos_computados, gs_db_url, "torneos computados")
 
