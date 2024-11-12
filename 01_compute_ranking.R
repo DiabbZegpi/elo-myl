@@ -1,25 +1,21 @@
-library(googlesheets4)
 library(tidyverse)
+library(googlesheets4)
 
 # Only one time to set the cache directory
 # library(gargle)
 # options(gargle_oauth_cache = ".gargle")
 
-gs4_auth(
-  email = "diabbluis@gmail.com",
-  cache = ".gargle"
-)
-# Importar data -----------------------------------------------------------
+gs4_auth(email = "diabbluis@gmail.com", cache = ".gargle")
 
-data_path <- "https://docs.google.com/spreadsheets/d/1dj8J1QKNHAEHMJP-TwFtFk-Gh0JXQ7Bayam6eXv2ai8/edit?gid=0#gid=0"
-rating_list_path <- "https://docs.google.com/spreadsheets/d/1Wh3PTzHAhoY7VKp-WfJgEF7IjWMYSdecgzIlwFnDA3E/edit?gid=0#gid=0"
+data_path <- "https://docs.google.com/spreadsheets/d/1ZErNDZVSbIP8ekj-mmTpdmJ_Gbpo8yQaN5HeLBlqblE/edit?gid=1605468956#gid=1605468956"
 
-resultados <- read_sheet(data_path, "resultados", col_types = "ccDiccii")
-torneos <- read_sheet(data_path, "torneos", col_types = "cccDcc")
+resultados <- read_sheet(data_path, "resultados", col_types = "ciccii")
+torneos <- read_sheet(data_path, "torneos", col_types = "ccDDcccccc")
 jugadores <- read_sheet(data_path, "jugadores", col_types = "ccc")
-ranking <- read_sheet(rating_list_path, "ranking", col_types = "icd")
-torneos_computados <- read_sheet(rating_list_path, "torneos computados", col_types = "cD")
+ranking <- read_sheet(data_path, "ranking", col_types = "Dcd")
+torneos_computados <- read_sheet(data_path, "torneos computados", col_types = "cD")
 
+nuevos_torneos <- read_csv("data/PB_RE_24_10_15_v0.csv")
 
 # Parámetros --------------------------------------------------------------
 
