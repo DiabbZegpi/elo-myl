@@ -11,7 +11,7 @@ torneos_db <- read_sheet(data_path, "torneos", col_types = "ccDDcccccc")
 jugadores_db <- read_sheet(data_path, "jugadores", col_types = "ccc")
 torneos_computados_db <- read_sheet(data_path, "torneos computados", col_types = "cD")
 
-df_raw <- read_csv(here("data", "PB_resultados_24_11_11.csv"))
+df_raw <- read_csv(here("data", "PB_resultados_24_11_25.csv"))
 
 df_filtered <-
   df_raw |>
@@ -195,7 +195,8 @@ ranking_tw <-
   bind_rows(computo_jugadores) |>
   slice_max(version, by = tor, with_ties = FALSE) |>
   mutate(version = version_actual) |>
-  bind_rows(ranking_db)
+  bind_rows(ranking_db) |>
+  arrange(desc(version), desc(elo))
 
 jugadores_tw <-
   jugadores |>
@@ -230,3 +231,18 @@ write_sheet(torneos_tw, data_path, "torneos")
 write_sheet(resultados_tw, data_path, "resultados")
 write_sheet(jugadores_tw, data_path, "jugadores")
 write_sheet(torneos_computados_tw, data_path, "torneos computados")
+
+posiciones_actuales <-
+  ranking_tw |>
+  filter(version == version_actual) |>
+  mutate(rank = min_rank(-elo)) |>
+  left_join(jugadores_tw, by = join_by(tor)) |>
+  mutate(
+    team = replace_na(team, ""),
+    team = str_to_title(team),
+    nombre = str_to_title(nombre)
+  ) |>
+  select(rank, nombre, tor, team, elo)
+
+path_lista_completa <- "https://docs.google.com/spreadsheets/d/1kR45qa9CH3yiZpRMyTan1Hvmi3DgDkV-Uc2wrSGn1C4/edit?gid=1129691467#gid=1129691467"
+write_sheet(posiciones_actuales, path_lista_completa, "elo-myl-lista-completa")
