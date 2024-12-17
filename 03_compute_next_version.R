@@ -11,12 +11,12 @@ torneos_db <- read_sheet(data_path, "torneos", col_types = "ccDDcccccc")
 jugadores_db <- read_sheet(data_path, "jugadores", col_types = "ccc")
 torneos_computados_db <- read_sheet(data_path, "torneos computados", col_types = "cD")
 
-df_raw <- read_csv(here("data", "PB_resultados_24_11_25.csv"))
+df_raw <- read_csv(here("data", "PB_resultados_24_12_17.csv"))
 
 df_filtered <-
   df_raw |>
   mutate(
-    fecha = ymd( str_extract(id_torneo, "(\\d+)", 1L)),
+    fecha = ymd(str_extract(id_torneo, "(\\d+)", 1L)),
     semana = as_date(floor_date(fecha, "weeks", week_start = 1))
   ) |>
   drop_na(tor_a, tor_b, resultado_a, resultado_b) |>
@@ -184,6 +184,9 @@ for (jugador in jugadores$tor) {
 
   computo_jugadores <- bind_rows(computo_jugadores, resultado_jugador)
 
+  if ((which(jugadores$tor == jugador) %% 100 == 0) | which(jugadores$tor == jugador) == length(jugadores$tor)) {
+    cat(paste0(which(jugadores$tor == jugador), "/", length(jugadores$tor)), "jugadores computados\n")
+  }
 }
 
 
