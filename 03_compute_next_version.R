@@ -11,7 +11,7 @@ torneos_db <- read_sheet(data_path, "torneos", col_types = "ccDDcccccc")
 jugadores_db <- read_sheet(data_path, "jugadores", col_types = "ccc")
 torneos_computados_db <- read_sheet(data_path, "torneos computados", col_types = "cD")
 
-df_raw <- read_csv(here("data", "PB_resultados_24_12_17.csv"))
+df_raw <- read_csv(here("data", "PB_resultados_25_02_09.csv"))
 
 df_filtered <-
   df_raw |>
@@ -22,8 +22,8 @@ df_filtered <-
   drop_na(tor_a, tor_b, resultado_a, resultado_b) |>
   filter(
     estado == "Reportado",
-    juego != "MyL Primer Bloque - Lanzamiento",
-    formato %in% c("Racial Edición", "Racial EdiciónModalidad")
+    juego != "MyL Primer Bloque - Lanzamiento"
+    # formato %in% c("Racial Edición", "Racial EdiciónModalidad")
   ) |>
   anti_join(torneos_db, by = join_by(id_torneo))
 
@@ -245,7 +245,26 @@ posiciones_actuales <-
     team = str_to_title(team),
     nombre = str_to_title(nombre)
   ) |>
-  select(rank, nombre, tor, team, elo)
+  select(rank, nombre, tor, team, elo) |>
+  left_join(
+    torneos_tw |> slice_max(fecha, by = tor, n = 1, with_ties = FALSE) |> select(tor, fecha),
+    by = join_by(tor)
+  ) |>
+  mutate(
+    fecha_ultimo_torneo = today() - fecha,
+    jugador_activo = fecha_ultimo_torneo <= months(3)
+  )
+
+posiciones_actuales_activos <-
+  posiciones_actuales |>
+  filter(jugador_activo) |>
+  select(rank, nombre, tor, team, elo) |>
+  mutate(rank = min_rank(-elo), elo = round(elo, 1))
+
+posiciones_actuales_completo <-
+  posiciones_actuales |>
+  select(rank, nombre, tor, team, elo, elo = round(elo, 1))
 
 path_lista_completa <- "https://docs.google.com/spreadsheets/d/1kR45qa9CH3yiZpRMyTan1Hvmi3DgDkV-Uc2wrSGn1C4/edit?gid=1129691467#gid=1129691467"
-write_sheet(posiciones_actuales, path_lista_completa, "elo-myl-lista-completa")
+write_sheet(posiciones_actuales_completo, path_lista_completa, "elo-myl-lista-completa")
+write_sheet(posiciones_actuales_activos, path_lista_completa, "elo-myl-jugadores-activos")
