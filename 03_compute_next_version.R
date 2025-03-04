@@ -11,7 +11,7 @@ torneos_db <- read_sheet(data_path, "torneos", col_types = "ccDDcccccc")
 jugadores_db <- read_sheet(data_path, "jugadores", col_types = "ccc")
 torneos_computados_db <- read_sheet(data_path, "torneos computados", col_types = "cD")
 
-df_raw <- read_csv(here("data", "PB_resultados_25_02_09.csv"))
+df_raw <- read_csv(here("data", "PB_resultados_25_03_04.csv"))
 
 df_filtered <-
   df_raw |>
@@ -263,7 +263,8 @@ posiciones_actuales_activos <-
 
 posiciones_actuales_completo <-
   posiciones_actuales |>
-  select(rank, nombre, tor, team, elo, elo = round(elo, 1))
+  select(rank, nombre, tor, team, elo) |>
+  mutate(elo = round(elo, 1))
 
 path_lista_completa <- "https://docs.google.com/spreadsheets/d/1kR45qa9CH3yiZpRMyTan1Hvmi3DgDkV-Uc2wrSGn1C4/edit?gid=1129691467#gid=1129691467"
 write_sheet(posiciones_actuales_completo, path_lista_completa, "elo-myl-lista-completa")
